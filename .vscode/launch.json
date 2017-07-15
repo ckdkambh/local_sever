@@ -3,7 +3,7 @@
     "configurations": [
 
         {
-            "name": "Run hello.js",
+            "name": "Run local_serve_web.js",
             "type": "node",
             "request": "launch",
             "program": "${workspaceRoot}/local_serve_web.js",

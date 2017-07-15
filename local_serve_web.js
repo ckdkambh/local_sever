@@ -1,45 +1,41 @@
 'use strict';
 
 var fs = require("fs"),
+    http = require('http'),
     handle_html_request = require('./handle_html_request'),
-    http = require('http');
+    requset_decoder = require('./requset_decoder');
 
-//handle_html_request("mp4", "E:\\迅雷下载1\\Kobayakawa_48-360p.mp4");
-//handle_html_request("dir", "E:\\");
-
-var server = http.createServer(function (request, response) {
+ var server = http.createServer(async function (request, response) {
     request.url = decodeURI(request.url);
     console.log(request.method + ': ' + request.url);
-    var last1 = request.url.lastIndexOf("=");
-    var last2 = request.url.lastIndexOf("/", last1);
-    var fileName = request.url.substring(last2 + 1);
-    var mode = "getfile";
-    console.log("1:" + fileName);
-    if (fileName === "") {
-        fileName = "start_page.html";
-    } else if (fileName.startsWith("getfilepath=")) {
-        console.log("in getfilepath");
-        fileName = fileName.substring("getfilepath=".length);
-        mode = "mp4";
-        handle_html_request(mode, fileName);
-        fileName = "output.html";
-    } else if (fileName.startsWith("getdirpath=")) {
-        console.log("in getdirpath");
-        fileName = fileName.substring("getdirpath=".length);
-        mode = "dir";
-        handle_html_request(mode, fileName);
-        fileName = "output.html";
-    } else if (fileName.startsWith("filepath=")) {
-        console.log("in filepath");
-        fileName = fileName.substring("filepath=".length);
-    } else if (fileName === "favicon.ico") {
+    var commend = {};
+    try {
+        commend = requset_decoder(request.url);
+    } catch (err) {
         response.writeHead(200);
         response.end('^o^');
         return;
     }
-    console.log("2:" + fileName);
-    response.writeHead(200);
-    fs.createReadStream(fileName).pipe(response);
+    console.log(JSON.stringify(commend));
+    switch (commend["conmmend"]) {
+        case "":
+        case "filepath": {
+            response.writeHead(200);
+            fs.createReadStream(commend["value"]).pipe(response);
+            break;
+        }
+        case "getfilepath":
+        case "getdirpath": {
+            await handle_html_request(commend["kind"], commend["value"]);
+            response.writeHead(200);
+            fs.createReadStream("output.html").pipe(response);
+            break;
+        }
+        default: {
+            response.writeHead(200);
+            response.end('^o^');
+        }
+    }
 });
 
 // 让服务器监听8080端口:
