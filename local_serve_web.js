@@ -1,51 +1,79 @@
 'use strict';
 
 var fs = require("fs"),
+    http = require('http'),
     handle_html_request = require('./handle_html_request'),
-    http = require('http');
+    handle_commend_request = require('./handle_commend_request'),
+    requset_decoder = require('./requset_decoder');
 
-//handle_html_request("mp4", "E:\\迅雷下载1\\Kobayakawa_48-360p.mp4");
-//handle_html_request("dir", "E:\\");
-
-var server = http.createServer(function (request, response) {
+var server = http.createServer(async function (request, response) {
     request.url = decodeURI(request.url);
     console.log(request.method + ': ' + request.url);
-    var last1 = request.url.lastIndexOf("=");
-    var last2 = request.url.lastIndexOf("/", last1);
-    var fileName = request.url.substring(last2 + 1);
-    var mode = "getfile";
-    console.log("1:" + fileName);
-    if (fileName === "") {
-        fileName = "start_page.html";
-    } else if (fileName.startsWith("getfilepath=")) {
-        console.log("in getfilepath");
-        fileName = fileName.substring("getfilepath=".length);
-        mode = "mp4";
-        handle_html_request(mode, fileName);
-        fileName = "output.html";
-    } else if (fileName.startsWith("getdirpath=")) {
-        console.log("in getdirpath");
-        fileName = fileName.substring("getdirpath=".length);
-        mode = "dir";
-        handle_html_request(mode, fileName);
-        fileName = "output.html";
-    } else if (fileName.startsWith("filepath=")) {
-        console.log("in filepath");
-        fileName = fileName.substring("filepath=".length);
-    } else if (fileName === "favicon.ico") {
+    var commend = {};
+    try {
+        commend = requset_decoder(request.url);
+    } catch (err) {
         response.writeHead(200);
-        response.end('^o^');
+        response.end(err.toString());
         return;
     }
-    console.log("2:" + fileName);
-    response.writeHead(200);
-    fs.createReadStream(fileName).pipe(response);
+    console.log(JSON.stringify(commend));
+    switch (commend["commend"]) {
+        case "":
+        case "filepath": {
+            response.writeHead(200);
+            fs.createReadStream(commend["value"]).pipe(response);
+            break;
+        }
+        case "getfilepath":
+        case "getdirpath": {
+            try {
+                await handle_html_request(commend["kind"], commend["value"]);
+                response.writeHead(200);
+                fs.createReadStream("output.html").pipe(response);
+            } catch (err) {
+                response.writeHead(200);
+                response.end(err.toString());
+                return;
+            }
+            break;
+        }
+        case "run": {
+            try {
+                await handle_commend_request(commend["kind"], commend["value"]);
+                response.writeHead(200);
+                response.end("成功");
+            } catch (err) {
+                response.writeHead(200);
+                response.end(err.toString());
+                return;
+            }
+            break;
+        }
+        default: {
+            response.writeHead(200);
+            response.end('do not support commend : ' + commend["commend"]);
+        }
+    }
 });
 
 // 让服务器监听8080端口:
 server.listen(8050);
 
-console.log('Server is running at http://127.0.0.1:8050/');
+function getIPAdress() {
+    var interfaces = require('os').networkInterfaces();
+    for (var devName in interfaces) {
+        var iface = interfaces[devName];
+        for (var i = 0; i < iface.length; i++) {
+            var alias = iface[i];
+            if (alias.family === 'IPv4' && alias.address !== '127.0.0.1' && !alias.internal) {
+                return alias.address;
+            }
+        }
+    }
+}
+
+console.log('Server is running at '+getIPAdress()+':8050/');
 
 
 

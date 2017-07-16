@@ -4,52 +4,45 @@ var fs = require("fs");
 var path = require("path");
 var create_dir_html = require('./create_dir_html');
 var create_mp4_html = require('./create_mp4_html');
+var create_html_html = require('./create_html_html');
 var html_text = "";
-function create_html(file_type, name) {
-    console.log("create_html:" + file_type + "," + name);
-    if (file_type === "mp4") {
-        html_text = create_mp4_html(name);
-    } else if (file_type === "dir") {
-        var filePath = name;
-        var fileArr = [];
-        var file_name_list = [];
-        try {
-            file_name_list = fs.readdirSync(filePath);
-        }
-        catch (err) {
-            console.log(err);
-        }
-        console.log(file_name_list);
-        file_name_list.forEach(function (filename) {
-            try {
-                var is_file = fs.statSync(path.join(filePath, filename));
-                if (!is_file.isFile() || filename.endsWith("MP4") || filename.endsWith("mp4"))
-                    fileArr.push({ name: filename, isFile: is_file.isFile() });
-            }
-            catch (err) {
-                console.log(err);
+
+var write_file = function (file_name, data) {
+    return new Promise(function (resolve, reject) {
+        fs.writeFile(file_name, data, 'utf-8', function (err) {
+            if (!err) {
+                resolve("ok");
+            } else {
+                reject(err);
             }
         });
-        console.log(fileArr);
-        html_text = create_dir_html(filePath, fileArr);
-    }
-    fs.writeFileSync('output.html', html_text, function (err) {
-        if (err) {
-            console.log(err);
-        } else {
-            console.log('output ok.');
-        }
     });
+};
+
+module.exports = async function (file_type, name) {
+    console.log("create_html:" + file_type + "," + name);
+    switch (file_type) {
+        case "mp4": {
+            html_text = create_mp4_html(name);
+            break;
+        }
+        case "dir": {
+            html_text = await create_dir_html(name);
+            break;
+        }
+        case "html": {
+            html_text = await create_html_html(name);
+            break;
+        }
+        default: {
+            throw new Error('not support : ' + file_type);
+        }
+    }
+    try {
+        await write_file("output.html", html_text);
+        console.log("output.html done");
+    } catch (err) {
+        console.log(err);
+    }
 }
-
-
-
-//获取后缀名
-function getdir(url) {
-    var arr = url.split('.');
-    var len = arr.length;
-    return arr[len - 1];
-}
-
-module.exports = create_html;
 
