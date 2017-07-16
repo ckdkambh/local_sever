@@ -1,5 +1,5 @@
 'use strict';
-var supported_kind_list =["mp4", "html"];
+var supported_kind_list = ["mp4", "html"];
 module.exports = function (url) {
     var link = url;
     console.log('requset_decoder: ' + link);
@@ -12,12 +12,12 @@ module.exports = function (url) {
         result = { commend: "", value: "start_page.html", kind: "" };
     } else if (command_line.startsWith("getfilepath")) {
         fileName = command_line.substring("getfilepath=>".length);
-        var ext = fileName.substring(fileName.lastIndexOf(".")+1).toLowerCase();
+        var ext = fileName.substring(fileName.lastIndexOf(".") + 1).toLowerCase();
         supported_kind_list.includes(ext);
         if (supported_kind_list.includes(ext)) {
             result = { commend: "getfilepath", value: fileName, kind: ext };
-        }else {
-            throw new Error('not support : '+ext);
+        } else {
+            throw new Error('not support : ' + ext);
         }
     } else if (command_line.startsWith("getdirpath")) {
         dirName = command_line.substring("getdirpath=>".length);
@@ -28,7 +28,10 @@ module.exports = function (url) {
     } else if (command_line.startsWith("store")) {
         fileName = command_line.substring("store=>".length);
         result = { commend: "run", value: fileName, kind: "store" };
-    }else if (command_line.startsWith("favicon.ico")) {
+    }else if (command_line.startsWith("commend")) {
+        fileName = command_line.substring("commend=>".length);
+        result = { commend: "run", value: fileName, kind: fileName };
+    } else if (command_line.startsWith("favicon.ico")) {
         throw new Error('not support favicon.ico');
     } else {
         result = { commend: "", value: command_line, kind: "" };

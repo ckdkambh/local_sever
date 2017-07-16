@@ -17,6 +17,7 @@
         "jquery": "*",
         "iconv-lite": "*",
         "superagent": "*",
-        "superagent-charset": "*"
+        "superagent-charset": "*",
+        "child_process": "*"
     }
 }

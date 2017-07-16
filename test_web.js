@@ -1,9 +1,26 @@
-var create_html_html = require('./create_html_html');
-
+var create_html_html = require('./create_html_html'),
+    iconv = require('iconv-lite');
+var fs = require("fs");
 // async function test(){
 //     await create_html_html("D:\\1111\\带婴儿打飞的技巧 - .html");
 // }
-return new Promise(function (resolve, reject) {
-    await create_html_html("D:\\1111\\带婴儿打飞的技巧 - .html");
-    resolve(ok);
+var exec = require('child_process').exec;
+var cmd = 'tasklist';
+
+var write_file = function (file_name, data) {
+    return new Promise(function (resolve, reject) {
+        fs.writeFile(file_name, data, 'utf-8', function (err) {
+            if (!err) {
+                resolve("ok");
+            } else {
+                reject(err);
+            }
+        });
+    });
+};
+
+exec("chcp 437", function (error, stdout, stderr) {
+    exec("tasklist", function (error, stdout, stderr) {
+        write_file("output.html", stdout);
+    });
 });

@@ -40,9 +40,8 @@ var server = http.createServer(async function (request, response) {
         }
         case "run": {
             try {
-                await handle_commend_request(commend["kind"], commend["value"]);
                 response.writeHead(200);
-                response.end("success");
+                response.end(await handle_commend_request(commend["kind"], commend["value"]));
             } catch (err) {
                 response.writeHead(200);
                 response.end(err.toString());
