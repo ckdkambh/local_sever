@@ -42,7 +42,7 @@ var server = http.createServer(async function (request, response) {
             try {
                 await handle_commend_request(commend["kind"], commend["value"]);
                 response.writeHead(200);
-                response.end("成功");
+                response.end("success");
             } catch (err) {
                 response.writeHead(200);
                 response.end(err.toString());
