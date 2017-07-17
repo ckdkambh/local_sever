@@ -8,15 +8,17 @@ const dom = new JSDOM('<!DOCTYPE html>' +
     '<html>' +
     '<head>' +
     '<meta charset="utf-8">' +
+    '<meta name="viewport" content="width=device-width, initial-scale=1" />'+
     '<title>!</title>' +
     '<style>' +
     '.s1 {' +
     'border-style: solid;' +
     'border-color: #ACD6FF;' +
-    'border-width: 5px;' +
-    'padding: 20px;' +
-    'margin: 20px;' +
+    'border-width: 0.1em;' +
+    'padding: 0.2em;' +
+    'margin: 0.2em;' +
     '}' +
+    'body {font: normal 90% Helvetica, Arial, sans-serif;}'+
     '</style>' +
     '</head>' +
     '<body>' +
