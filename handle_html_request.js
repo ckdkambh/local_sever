@@ -4,6 +4,7 @@ var fs = require("fs");
 var path = require("path");
 var create_dir_html = require('./create_dir_html');
 var create_mp4_html = require('./create_mp4_html');
+var create_pic_html = require('./create_pic_html');
 var create_html_html = require('./create_html_html');
 var html_text = "";
 
@@ -24,6 +25,10 @@ module.exports = async function (file_type, name) {
     switch (file_type) {
         case "mp4": {
             html_text = create_mp4_html(name);
+            break;
+        }
+        case "jpg": {
+            html_text = create_pic_html(name);
             break;
         }
         case "dir": {

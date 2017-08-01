@@ -57,6 +57,15 @@ module.exports = async function (commend, value) {
             }
             break;
         }
+        case "screen_cut": {
+            try {
+                await run_common_commend("python D:\\gitCode\\python_collection\\src\\ScreenCut.py");
+                return "success";
+            } catch (err) {
+                throw err;
+            }
+            break;
+        }
         default: {
             throw new Error('not support : ' + file_type);
         }
