@@ -28,11 +28,17 @@ module.exports = function (url) {
     } else if (command_line.startsWith("store")) {
         fileName = command_line.substring("store=>".length);
         result = { commend: "run", value: fileName, kind: "store" };
-    }else if (command_line.startsWith("commend")) {
+    } else if (command_line.startsWith("commend")) {
         fileName = command_line.substring("commend=>".length);
         result = { commend: "run", value: fileName, kind: fileName };
     } else if (command_line.startsWith("favicon.ico")) {
         throw new Error('not support favicon.ico');
+    } else if (command_line.startsWith("pic_view")) {
+        fileName = command_line.substring("pic_view=>".length);
+        result = { commend: "run", value: fileName, kind: "pic_view" };
+    } else if (command_line.startsWith("getjs")) {
+        fileName = command_line.substring("getjs=>".length);
+        result = { commend: "", value: fileName, kind: "getjs" };
     } else {
         result = { commend: "", value: command_line, kind: "" };
     }

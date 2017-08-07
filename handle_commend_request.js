@@ -2,6 +2,7 @@
 
 var commend_store = require('./commend_store');
 var create_pic_html = require('./create_pic_html');
+var create_pic_view_html = require('./create_pic_view_html');
 var exec = require('child_process').exec;
 
 function run_common_commend(commend) {
@@ -71,6 +72,14 @@ module.exports = async function (commend, value) {
             try {
                 await run_common_commend("shutdown -s -t 20");
                 return "success";
+            } catch (err) {
+                throw err;
+            }
+            break;
+        }
+        case "pic_view": {
+            try {
+                return await create_pic_view_html(value);
             } catch (err) {
                 throw err;
             }

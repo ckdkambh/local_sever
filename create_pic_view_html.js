@@ -1,4 +1,5 @@
 'use strict';
+var support_type = ["jpg", "png", "jpeg"];
 const jsdom = require("jsdom");
 var path = require("path"),
     fs = require("fs"),
@@ -8,7 +9,7 @@ const dom = new JSDOM('<!DOCTYPE html>' +
     '<html>' +
     '<head>' +
     '<meta charset="utf-8">' +
-    '<meta name="viewport" content="width=device-width, initial-scale=1" />'+
+    '<meta name="viewport" content="width=device-width, initial-scale=1" />' +
     '<title>!</title>' +
     '<style>' +
     '.s1 {' +
@@ -18,8 +19,10 @@ const dom = new JSDOM('<!DOCTYPE html>' +
     'padding: 0.2em;' +
     'margin: 0.2em;' +
     '}' +
-    'body {font: normal 90% Helvetica, Arial, sans-serif;}'+
+    'body {font: normal 90% Helvetica, Arial, sans-serif;}' +
     '</style>' +
+    '<script src="getjs=>D:/gitCode/local_sever/jquery-3.1.1.js"></script>'+
+    '<script src="getjs=>D:/gitCode/local_sever/pic_view.js"></script>'+
     '</head>' +
     '<body>' +
     '</body>' +
@@ -28,29 +31,12 @@ const dom = new JSDOM('<!DOCTYPE html>' +
 var $ = require('jquery')(dom.window);
 
 function get_html(path_name, key_list) {
-    var parentPath = path_name.substring(0, path_name.lastIndexOf('/')+1);
-    if (parentPath === path_name){
-        parentPath = "start_page.html";
-    }
     $("body div").remove();
     $("body").append('<div id="back" class="s1"><p></p></div>');
-    $("body").append('<div id="MP4" class="s1"><p>文件</p></div>');
-    $("body").append('<div id="dir" class="s1"><p>文件夹</p></div>');
-    if (parentPath === "start_page.html"){
-        $("#back").append('<p><a href="filepath=>' + parentPath + '">' + "back" + '</a></p>');    
-    }
-    else{
-        $("#back").append('<p><a href="getdirpath=>' + parentPath + '">' + "back" + '</a></p>');
-    }
-    $("#back").append('<p><a href="pic_view=>' + path_name + '">' + "图片浏览模式" + '</a></p>');
+    $("body").append('<div id="pic" class="s1"><p>图片</p></div>');
+    $("#back").append('<p><a href="getdirpath=>' + path_name + '">' + "back" + '</a></p>');
     key_list.map(function (x) {
-        if (x["isFile"]) {
-            $("#MP4").append('<p><a href="getfilepath=>' + path.join(path_name, x['name']) + '">' + x['name'] + '</a></p>');
-            //$("#MP4").append('<p>' + x['name'] + '</p>');
-        } else {
-            $("#dir").append('<p><a href="getdirpath=>' + path.join(path_name, x['name']) + '">' + x['name'] + '</a></p>');
-            //$("#dir").append('<p>' + x['name'] + '</p>');
-        }
+        $("#pic").append('<p><img src="filepath=>' + path.join(path_name, x['name']) + '" style="display:none;"/></p>');
     });
     return $(":root").html();
 };
@@ -72,7 +58,7 @@ var get_file_stat = function (file_path, file_name) {
     return new Promise(function (resolve, reject) {
         fs.stat(path.join(file_path, file_name), function (err, stat) {
             if (!err) {
-                resolve({ name: file_name, isFile: stat.isFile(), dateModify: stat.mtime});
+                resolve({ name: file_name, isFile: stat.isFile(), dateModify: stat.mtime });
             } else {
                 console.log(err);
                 reject(undefined);
@@ -98,10 +84,18 @@ module.exports = async (path_name) => {
             console.log(err);
             continue;
         }
-        file_stat_list.push(key_list);
+        var is_support =
+            support_type.map((x) => {
+                return f.endsWith(x);
+            }).reduce((x, y) => {
+                return x || y;
+            });  
+        if (key_list["isFile"] === true && is_support) {
+            file_stat_list.push(key_list);
+        }
     }
     file_stat_list = file_stat_list.sort((x, y) => {
-        return y["dateModify"]-x["dateModify"];
+        return y["dateModify"] - x["dateModify"];
     });
     return get_html(path_name, file_stat_list);
 };
