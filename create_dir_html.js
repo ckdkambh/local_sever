@@ -28,11 +28,20 @@ const dom = new JSDOM('<!DOCTYPE html>' +
 var $ = require('jquery')(dom.window);
 
 function get_html(path_name, key_list) {
+    var parentPath = path_name.substring(0, path_name.lastIndexOf('/')+1);
+    if (parentPath === path_name){
+        parentPath = "start_page.html";
+    }
     $("body div").remove();
     $("body").append('<div id="back" class="s1"><p></p></div>');
     $("body").append('<div id="MP4" class="s1"><p>文件</p></div>');
     $("body").append('<div id="dir" class="s1"><p>文件夹</p></div>');
-    $("#back").append('<p><a href="getdirpath=>' + path_name + '">' + "back" + '</a></p>');
+    if (parentPath === "start_page.html"){
+        $("#back").append('<p><a href="filepath=>' + parentPath + '">' + "back" + '</a></p>');    
+    }
+    else{
+        $("#back").append('<p><a href="getdirpath=>' + parentPath + '">' + "back" + '</a></p>');
+    }
     key_list.map(function (x) {
         if (x["isFile"]) {
             $("#MP4").append('<p><a href="getfilepath=>' + path.join(path_name, x['name']) + '">' + x['name'] + '</a></p>');

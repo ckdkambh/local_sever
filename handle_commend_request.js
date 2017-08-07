@@ -1,6 +1,7 @@
 'use strict';
 
 var commend_store = require('./commend_store');
+var create_pic_html = require('./create_pic_html');
 var exec = require('child_process').exec;
 
 function run_common_commend(commend) {
@@ -60,6 +61,15 @@ module.exports = async function (commend, value) {
         case "screen_cut": {
             try {
                 await run_common_commend("python D:\\gitCode\\python_collection\\src\\ScreenCut.py");
+                return create_pic_html("D:\\screen_cut.jpg");
+            } catch (err) {
+                throw err;
+            }
+            break;
+        }
+        case "shutdown": {
+            try {
+                await run_common_commend("shutdown -s -t 20");
                 return "success";
             } catch (err) {
                 throw err;
