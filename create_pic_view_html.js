@@ -36,8 +36,9 @@ function get_html(path_name, key_list) {
     $("body").append('<div id="pic" class="s1"><p>图片</p></div>');
     $("#back").append('<p><a href="getdirpath=>' + path_name + '">' + "back" + '</a></p>');
     key_list.map(function (x) {
-        $("#pic").append('<p><img src="filepath=>' + path.join(path_name, x['name']) + '" style="display:none;"/></p>');
+        $("#pic").append('<p><label val="filepath=>' + path.join(path_name, x['name']) + '" class="none"></label></p>');
     });
+    $("#pic").append('<p><img /></p>');
     return $(":root").html();
 };
 
