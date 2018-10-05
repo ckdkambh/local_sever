@@ -15,9 +15,20 @@
             font: normal 90% Helvetica, Arial, sans-serif;
         }
     </style>
+    <script src="getjs=>D:/gitCode/local_sever/jquery-3.1.1.js"></script>
 </head>
 
 <body>
+    <script>
+        'use strict';
+        function shutdown() {
+            var result = confirm("是否确认关机？");
+            if (result) {
+                $.ajax({url:"commend=>shutdown",async:false});
+                alert("准备启动关机");
+            }
+        };
+    </script>
     <div id="dir" class="s1">
         <p>文件夹</p>
         <p><a href="getdirpath=>C:\">C:\</a></p>
@@ -26,11 +37,14 @@
         <p><a href="getdirpath=>F:\">F:\</a></p>
     </div>
     <div id="commend" class="s1">
-        <p>命令</p>
+        <p>普通命令</p>
         <p><a href="commend=>tasklist">查询系统线程</a></p>
         <p><a href="commend=>bai_du_yun_start">打开百度云</a></p>
         <p><a href="commend=>bai_du_yun_stop">关闭百度云</a></p>
         <p><a href="commend=>screen_cut">显示电脑屏幕</a></p>
-        <p><a href="commend=>shutdown">关机</a></p>
+    </div>
+    <div id="dan_commend" class="s1">
+        <p>危险命令</p>
+        <p><button id="startBtn" onclick="shutdown()">关机</button></p>
     </div>
 </body>

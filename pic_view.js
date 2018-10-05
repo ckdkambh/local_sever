@@ -1,51 +1,92 @@
+var timer_running = false;
+var imgList;
+var is_auto_play_enable = false;
+var auto_play_timer_id;
+var key_pressing_timer_id;
+var interval_timer_length = 1000;
+
+function get_current() {
+    var i = 0;
+    for (; i < imgList.length; i++) {
+        if (imgList[i].className === 'block') {
+            return i;
+        }
+    }
+    return -1;
+}
+
+function set_next() {
+    var current_id = get_current();
+    console.log("show_next current_id %d", current_id);
+    if (current_id !== -1) {
+        if (current_id < imgList.length - 1) {
+            imgList[current_id].className = 'none';
+            imgList[current_id + 1].className = 'block';
+        } else {
+            imgList[current_id].className = 'none';
+            imgList[0].className = 'block';
+        }
+    }
+};
+
+function set_prev() {
+    var current_id = get_current();
+    console.log("show_prev current_id %d", current_id);
+    if (current_id !== -1) {
+        if (current_id > 0) {
+            imgList[current_id].className = 'none';
+            imgList[current_id - 1].className = 'block';
+        } else {
+            imgList[current_id].className = 'none';
+            imgList[imgList.length - 1].className = 'block';
+        }
+    }
+};
+
+function show_img() {
+    var cur_index = get_current();
+    var path = imgList[cur_index].getAttribute('val');
+    $("img")[0].setAttribute('src', path);
+    ($("#back").find("label"))[0].innerText = "第"+(cur_index+1)+"张，共"+imgList.length+"张";
+};
+
+function disable_auto_play(){
+    console.log("call  disable_auto_play");
+    is_auto_play_enable = false;
+    clearInterval(auto_play_timer_id);
+}
+
+function show_next_img(){
+    console.log("call show_next_img");
+    set_next();
+    show_img();
+}
+function show_prev_img(){
+    console.log("call show_prev_img");
+    set_prev();
+    show_img();
+}
+function enable_auto_play(){
+    console.log("call  enable_auto_play");
+
+    is_auto_play_enable = true;
+    auto_play_timer_id = setInterval(show_next_img, interval_timer_length);
+}
+function enable_auto_play_prev(){
+    console.log("call  enable_auto_play_prev");
+
+    is_auto_play_enable = true;
+    auto_play_timer_id = setInterval(show_prev_img, interval_timer_length);
+}
+
 (function () {
     jQuery(document).ready(function () {
         console.log("1111 %s", $("label")[0].className);
-        $("label")[0].className = "block";
-        var imgList = $("label");
+        imgList = $("#pic").find("label");
+        imgList[0].className = "block";
         var islarge = false;
-        var get_current = function () {
-            var i = 0;
-            for (; i < imgList.length; i++) {
-                if ($("label")[i].className === 'block') {
-                    return i;
-                }
-            }
-            return -1;
-        };
+
         console.log("get_current %d", get_current());
-        var show_next = function () {
-            var current_id = get_current();
-            console.log("show_next current_id %d", current_id);
-            if (current_id !== -1) {
-                if (current_id < imgList.length - 1) {
-                    $("label")[current_id].className = 'none';
-                    $("label")[current_id + 1].className = 'block';
-                } else {
-                    $("label")[current_id].className = 'none';
-                    $("label")[0].className = 'block';
-                }
-            }
-        };
-
-        var show_prev = function () {
-            var current_id = get_current();
-            console.log("show_prev current_id %d", current_id);
-            if (current_id !== -1) {
-                if (current_id > 0) {
-                    $("label")[current_id].className = 'none';
-                    $("label")[current_id - 1].className = 'block';
-                } else {
-                    $("label")[current_id].className = 'none';
-                    $("label")[imgList.length - 1].className = 'block';
-                }
-            }
-        };
-
-        var show_img = function () {
-            var path = $("label")[get_current()].getAttribute('val');
-            $("img")[0].setAttribute('src', path);
-        };
 
         var max_w = window.innerWidth;
         var max_h = window.innerHeight;
@@ -90,9 +131,9 @@
             console.log("screenX %d", x.offsetX);
             if (!islarge) {
                 if (x.offsetX < $("img")[0].width / 3) {
-                    show_prev();
+                    set_prev();
                 } else if (x.offsetX > 2 * $("img")[0].width / 3) {
-                    show_next();
+                    set_next();
                 } else {
                     large_mode();
                 }
@@ -103,20 +144,53 @@
             show_img();
         });
 
-        $(document).keydown(function (event) {
+        $(document).keyup(function (event) {
             console.log('press key :' + event.keyCode);
-            if (event.keyCode === 65) {
-                show_prev();
-            } else if (event.keyCode === 68) {
-                show_next();
-            } else if (event.keyCode === 87) {
+
+            disable_auto_play();
+            clearInterval(key_pressing_timer_id);
+            if (event.keyCode === 65 || event.keyCode === 37) {
+                set_prev();
+            } else if (event.keyCode === 68 || event.keyCode === 39) {
+                set_next();
+            } else if (event.keyCode === 87 || event.keyCode === 38) {
                 turn_to_large();
-            } else if (event.keyCode === 83) {
+            } else if (event.keyCode === 83 || event.keyCode === 40) {
                 turn_to_small();
             } else if (event.keyCode === 81) {
                 turn_to_orig();
             }
             show_img();
         });
+        $(document).keypress(function (event) {
+            console.log('disable auto_play cause of key press');
+            is_auto_play_enable = false;
+            disable_auto_play();
+            $("#auto_play_control")[0].innerText = "启动自动播放";
+        });
+        // $(document).keydown(function (event) {
+        //     console.log('keypress...');
+        //     if (event.keyCode === 65 || event.keyCode === 37) {
+        //         interval_timer_length = 1000;
+        //         key_pressing_timer_id = setTimeout(enable_auto_play_prev, 1500);
+        //     } else if (event.keyCode === 68 || event.keyCode === 39) {
+        //         interval_timer_length = 1000;
+        //         key_pressing_timer_id = setTimeout(enable_auto_play, 1500);
+        //     }
+        // });
+
+        $("#auto_play_control").click(function(){
+            if (is_auto_play_enable){
+                is_auto_play_enable = false;
+                disable_auto_play();
+                $("#auto_play_control")[0].innerText = "启动自动播放";
+            }else{
+                is_auto_play_enable = true;
+                interval_timer_length = parseInt($("#auto_play_interval_timer_length").val() || 1)*1000;
+                console.log("interval_timer_length %d", interval_timer_length);
+                enable_auto_play();
+                $("#auto_play_control")[0].innerText = "关闭自动播放";
+            }
+        });   
     });
 })();

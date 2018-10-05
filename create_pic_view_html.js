@@ -1,5 +1,5 @@
 'use strict';
-var support_type = ["jpg", "png", "jpeg"];
+var support_type = ["jpg", "png", "jpeg", "gif"];
 const jsdom = require("jsdom");
 var path = require("path"),
     fs = require("fs"),
@@ -22,6 +22,7 @@ const dom = new JSDOM('<!DOCTYPE html>' +
     'body {font: normal 90% Helvetica, Arial, sans-serif;}' +
     '</style>' +
     '<script src="getjs=>D:/gitCode/local_sever/jquery-3.1.1.js"></script>'+
+    '<script src="getjs=>D:/gitCode/local_sever/timer_tools.js"></script>'+
     '<script src="getjs=>D:/gitCode/local_sever/pic_view.js"></script>'+
     '</head>' +
     '<body>' +
@@ -35,6 +36,8 @@ function get_html(path_name, key_list) {
     $("body").append('<div id="back" class="s1"><p></p></div>');
     $("body").append('<div id="pic" class="s1"><p>图片</p></div>');
     $("#back").append('<p><a href="getdirpath=>' + path_name + '">' + "back" + '</a></p>');
+    $("#back").append('<p>设置时长：<input id="auto_play_interval_timer_length" type="text">   <button id="auto_play_control">' + "启动自动播放" + '</button></p>');
+    $("#back").append('<p><label id="progress"></label></p>');
     key_list.map(function (x) {
         $("#pic").append('<p><label val="filepath=>' + path.join(path_name, x['name']) + '" class="none"></label></p>');
     });

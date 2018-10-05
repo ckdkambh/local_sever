@@ -45,7 +45,7 @@ function get_html(path_name, key_list) {
     $("#back").append('<p><a href="pic_view=>' + path_name + '">' + "图片浏览模式" + '</a></p>');
     key_list.map(function (x) {
         if (x["isFile"]) {
-            $("#MP4").append('<p><a href="getfilepath=>' + path.join(path_name, x['name']) + '">' + x['name'] + '</a></p>');
+            $("#MP4").append('<p><a href="getfilepath=>' + path.join(path_name, x['name'])/* + '" download="'+x['name']*/+'">' + x['name'] + '</a></p>');
             //$("#MP4").append('<p>' + x['name'] + '</p>');
         } else {
             $("#dir").append('<p><a href="getdirpath=>' + path.join(path_name, x['name']) + '">' + x['name'] + '</a></p>');

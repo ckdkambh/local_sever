@@ -27,7 +27,8 @@ module.exports = async function (file_type, name) {
             html_text = create_mp4_html(name);
             break;
         }
-        case "jpg": {
+        case "jpg":
+        case "gif": {
             html_text = create_pic_html(name);
             break;
         }
