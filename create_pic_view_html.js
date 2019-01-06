@@ -36,12 +36,10 @@ function get_html(path_name, key_list) {
     $("body").append('<div id="back" class="s1"><p></p></div>');
     $("body").append('<div id="pic" class="s1"><p>图片</p></div>');
     $("#back").append('<p><a href="getdirpath=>' + path_name + '">' + "back" + '</a></p>');
-    $("#back").append('<p>设置时长：<input id="auto_play_interval_timer_length" type="text">   <button id="auto_play_control">' + "启动自动播放" + '</button></p>');
-    $("#back").append('<p><label id="progress"></label></p>');
     key_list.map(function (x) {
         $("#pic").append('<p><label val="filepath=>' + path.join(path_name, x['name']) + '" class="none"></label></p>');
     });
-    $("#pic").append('<p><img /></p>');
+    $("#pic").append('<p><img style="position:relative;top:5px; left:5px;"/></p>');
     return $(":root").html();
 };
 

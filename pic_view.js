@@ -48,8 +48,9 @@ function show_img() {
     var path = imgList[cur_index].getAttribute('val');
     $("img")[0].setAttribute('src', path);
     ($("#back").find("label"))[0].innerText = "第"+(cur_index+1)+"张，共"+imgList.length+"张";
+    window.scrollTo(0, document.documentElement.clientHeight);
 };
-
+ 
 function disable_auto_play(){
     console.log("call  disable_auto_play");
     is_auto_play_enable = false;
@@ -78,10 +79,28 @@ function enable_auto_play_prev(){
     is_auto_play_enable = true;
     auto_play_timer_id = setInterval(show_prev_img, interval_timer_length);
 }
-
+function change_auto_play_status(){
+    if (is_auto_play_enable){
+        is_auto_play_enable = false;
+        disable_auto_play();
+        $("#auto_play_control")[0].innerText = "启动自动播放";
+    }else{
+        is_auto_play_enable = true;
+        interval_timer_length = parseInt($("#auto_play_interval_timer_length").val());
+        interval_timer_length = (!interval_timer_length || interval_timer_length == 0 || interval_timer_length == NaN) ? 1 : interval_timer_length; 
+        interval_timer_length *= 500;
+        console.log("interval_timer_length %d", interval_timer_length);
+        enable_auto_play();
+        $("#auto_play_control")[0].innerText = "关闭自动播放";
+    }
+}
 (function () {
     jQuery(document).ready(function () {
         console.log("1111 %s", $("label")[0].className);
+        $("#back").append('<p>设置时长：<input id="auto_play_interval_timer_length" type="text">   <button id="auto_play_control">' + "启动自动播放" + '</button></p>');
+        $("#back").append('<p><button id="priv_img"><-</button>    <button id="next_img">-></button>    <button id="enlarge_img">+</button>   <button id="narrow_img">-</button></p>');
+        $("#back").append('<p><label id="progress"></label></p>');
+
         imgList = $("#pic").find("label");
         imgList[0].className = "block";
         var islarge = false;
@@ -90,7 +109,7 @@ function enable_auto_play_prev(){
 
         var max_w = window.innerWidth;
         var max_h = window.innerHeight;
-
+        var cur_scale = 1.0;
         var small_mode = function () {
             $("img")[0].setAttribute('style', 'max-width: ' + window.innerWidth + 'px;');
             $("img")[0].setAttribute('style', 'max-height: ' + window.innerHeight + 'px;');
@@ -106,15 +125,26 @@ function enable_auto_play_prev(){
         var turn_to_large = function () {
             max_w += 100;
             max_h += 100;
-            $("img")[0].setAttribute('style', 'max-width: ' + max_w + 'px;');
-            $("img")[0].setAttribute('style', 'max-height: ' + max_h + 'px;');
+            cur_scale += 0.1;
+            cur_style = 'max-width: ' + max_w + 'px;' +
+            'max-height: ' + max_h + 'px;'+
+            'margin-left: ' + max_w/4 + 'px;' +
+            'margin-top: ' + max_h/8 + 'px;' +
+            'transform:scale('+cur_scale+');';
+            $("img")[0].setAttribute('style', cur_style);
+            console.log("%O", $("img")[0]);
         }
 
         var turn_to_small = function () {
             max_w -= 100;
             max_h -= 100;
-            $("img")[0].setAttribute('style', 'max-width: ' + max_w + 'px;');
-            $("img")[0].setAttribute('style', 'max-height: ' + max_h + 'px;');
+            cur_scale -= 0.1;
+            cur_style = 'max-width: ' + max_w + 'px;' +
+            'max-height: ' + max_h + 'px;'+
+            'margin-left: ' + max_w/4 + 'px;' +
+            'margin-top: ' + max_h/8 + 'px;' +
+            'transform:scale('+cur_scale+');';
+            $("img")[0].setAttribute('style', cur_style);
         }
 
         var turn_to_orig = function () {
@@ -147,8 +177,9 @@ function enable_auto_play_prev(){
         $(document).keyup(function (event) {
             console.log('press key :' + event.keyCode);
 
-            disable_auto_play();
-            clearInterval(key_pressing_timer_id);
+            if (event.keyCode !== 32){
+                disable_auto_play();
+            }
             if (event.keyCode === 65 || event.keyCode === 37) {
                 set_prev();
             } else if (event.keyCode === 68 || event.keyCode === 39) {
@@ -159,15 +190,12 @@ function enable_auto_play_prev(){
                 turn_to_small();
             } else if (event.keyCode === 81) {
                 turn_to_orig();
+            } else if (event.keyCode === 32) {
+                change_auto_play_status();
             }
             show_img();
         });
-        $(document).keypress(function (event) {
-            console.log('disable auto_play cause of key press');
-            is_auto_play_enable = false;
-            disable_auto_play();
-            $("#auto_play_control")[0].innerText = "启动自动播放";
-        });
+
         // $(document).keydown(function (event) {
         //     console.log('keypress...');
         //     if (event.keyCode === 65 || event.keyCode === 37) {
@@ -179,18 +207,22 @@ function enable_auto_play_prev(){
         //     }
         // });
 
-        $("#auto_play_control").click(function(){
-            if (is_auto_play_enable){
-                is_auto_play_enable = false;
-                disable_auto_play();
-                $("#auto_play_control")[0].innerText = "启动自动播放";
-            }else{
-                is_auto_play_enable = true;
-                interval_timer_length = parseInt($("#auto_play_interval_timer_length").val() || 1)*1000;
-                console.log("interval_timer_length %d", interval_timer_length);
-                enable_auto_play();
-                $("#auto_play_control")[0].innerText = "关闭自动播放";
-            }
-        });   
+        $("#auto_play_control").click(change_auto_play_status);
+        $("#priv_img").click(function(x){
+            set_prev();
+            show_img();
+        });
+        $("#next_img").click(function(x){
+            set_next();
+            show_img();
+        });
+        $("#enlarge_img").click(function(x){
+            turn_to_large();
+            show_img();
+        });
+        $("#narrow_img").click(function(x){
+            turn_to_small();
+            show_img();
+        });
     });
 })();
