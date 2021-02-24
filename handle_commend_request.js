@@ -61,7 +61,7 @@ module.exports = async function (commend, value) {
         }
         case "screen_cut": {
             try {
-                await run_common_commend("python D:\\gitCode\\python_collection\\src\\ScreenCut.py");
+                await run_common_commend("python D:\\ScreenCut.py");
                 return create_pic_html("D:\\screen_cut.jpg");
             } catch (err) {
                 throw err;

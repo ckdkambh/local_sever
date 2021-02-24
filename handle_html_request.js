@@ -28,6 +28,7 @@ module.exports = async function (file_type, name) {
             break;
         }
         case "jpg":
+        case "JPG":
         case "gif": {
             html_text = create_pic_html(name);
             break;

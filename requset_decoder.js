@@ -1,5 +1,5 @@
 'use strict';
-var supported_kind_list = ["mp4", "html", "jpg", "gif"];
+var supported_kind_list = ["mp4", "html", "jpg", "gif", "JPG"];
 module.exports = function (url) {
     var link = url;
     console.log('requset_decoder: ' + link);

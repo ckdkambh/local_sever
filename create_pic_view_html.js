@@ -1,5 +1,5 @@
 'use strict';
-var support_type = ["jpg", "png", "jpeg", "gif"];
+var support_type = ["jpg", "png", "jpeg", "gif", "JPG"];
 const jsdom = require("jsdom");
 var path = require("path"),
     fs = require("fs"),
@@ -99,5 +99,7 @@ module.exports = async (path_name) => {
     file_stat_list = file_stat_list.sort((x, y) => {
         return y["dateModify"] - x["dateModify"];
     });
+    console.log("get_html :" + path_name);
+    console.log("get_html :" + file_stat_list);
     return get_html(path_name, file_stat_list);
 };
